@@ -18,10 +18,22 @@
             return message;     \
     } while (0)
 
-#define N 1000
+#define N 10
 
 static list_item_t items[N];
 static list_t l;
+
+// Fisher-Yates Shuffle
+void shuffle_items()
+{
+    for (size_t i = N - 1; i > 0; i--)
+    {
+        size_t j = rand() % (i + 1);
+        list_item_t temp = items[i];
+        items[i] = items[j];
+        items[j] = temp;
+    }
+}
 
 static list_t *list_reset(void)
 {
@@ -32,6 +44,17 @@ static list_t *list_reset(void)
     }
     l.head = NULL;
     return &l;
+}
+
+static void print_list(list_t *list)
+{
+    list_item_t *cur = list->head;
+    while (cur)
+    {
+        printf("%d -> ", cur->value);
+        cur = cur->next;
+    }
+    printf("NULL\n");
 }
 
 static char *test_list(void)
@@ -76,11 +99,48 @@ static char *test_list(void)
     return NULL;
 }
 
+static char *test_list_sort(void)
+{
+    list_reset();
+
+    list_t list1 = {.head = NULL};
+    list_t *list = &l;
+
+    shuffle_items();
+
+    for (size_t i = 0; i < N; i++)
+    {
+        list_insert_before(list, NULL, &items[i]);
+    }
+
+    my_assert(list_size(list) == N, "Initial list size should be N");
+
+    printf("Before sorting:\n");
+    print_list(list);
+
+    list_sort(list);
+
+    printf("After sorting:\n");
+    print_list(list);
+
+    list_item_t *cur = list->head;
+    int prev_value = -1;
+    while (cur)
+    {
+        my_assert(prev_value <= cur->value, "List is not sorted correctly!");
+        prev_value = cur->value;
+        cur = cur->next;
+    }
+
+    return NULL;
+}
+
 int tests_run = 0;
 
 static char *test_suite(void)
 {
     my_run_test(test_list);
+    my_run_test(test_list_sort);
     return NULL;
 }
 

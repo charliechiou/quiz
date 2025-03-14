@@ -34,3 +34,5 @@ void list_insert_before(list_t *l,
                         list_item_t *item);
 
 size_t list_size(const list_t *head);
+
+void list_sort(list_t *head);
